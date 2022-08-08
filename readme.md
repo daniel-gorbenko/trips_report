@@ -19,3 +19,13 @@ php app.php example-input.csv ouptut.csv s
 ## How to verify that it works correctly
 
 Fill an input file manually with different types of scenarios, check by yourself and then run script and compare results. May be I will add tests in the future.
+
+## Efficiency
+
+### Time complexity
+
+Worst case: one driver carrying one passenger - `O(n + n^2/2)`
+
+### RAM
+
+Worst case: all `n` trips are stored in memory + `n` drivers are stored in memory. How much is allocated for each element - did not look.
