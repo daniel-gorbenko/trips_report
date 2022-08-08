@@ -10,7 +10,7 @@ DURATION_TYPE:
 
 ## Example
 
-This will generate `output.csv` file with duration in seconds based on the input `example-input.csv`:
+This will generate `output.csv` file with duration in seconds based on the input `example-input.csv` file:
 
 ```
 php app.php example-input.csv ouptut.csv s

@@ -179,6 +179,7 @@ if (($fp = fopen($input_csv, "r")) !== FALSE) {
 		} else {
 			$modified_existed = false;
 
+			// O(n^2/2)
 			foreach($driver->trips as $driver_trip) {
 				$tmp_start_datetime =  $driver_trip->getStartDatetime();
 				$tmp_end_datetime = $driver_trip->getEndDatetime();
