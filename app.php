@@ -56,7 +56,7 @@ class Trip {
 
 	public function inDatetimeRange(string $datetime): bool
 	{
-		if($this->start_datetime >= $datetime && $this->end_datetime <= $datetime) {
+		if($this->getStartDatetime() <= $datetime && $this->getEndDatetime() >= $datetime) {
 			return true;
 		} else {
 			return false;
@@ -139,13 +139,19 @@ class DriverCollection {
 	CHECK INPUT PARAMS
 */
 
-if(!isset($argv[1]) || !isset($argv[2])) {
-	echo "Syntax: php app.php input_file output_file" . PHP_EOL;
+if(!isset($argv[1]) || !isset($argv[2]) || !isset($argv[3])) {
+	echo "Syntax: php app.php input_file output_file duration_type" . PHP_EOL;
+	exit;
+}
+
+if($argv[3] !== 'd' && $argv[3] !== 's') {
+	echo "Syntax: duration_type must be 'd' or 's'" . PHP_EOL;
 	exit;
 }
 
 $input_csv = $argv[1];
 $output_csv = $argv[2];
+$duration_type = $argv[3];
 
 if (($fp = fopen($input_csv, "r")) !== FALSE) {
 	$i = 0;
@@ -177,17 +183,16 @@ if (($fp = fopen($input_csv, "r")) !== FALSE) {
 				$tmp_start_datetime =  $driver_trip->getStartDatetime();
 				$tmp_end_datetime = $driver_trip->getEndDatetime();
 
-				if($driver_trip->inDatetimeRange($trip->getEndDatetime()) && $driver_trip->getStartDatetime() > $trip->getStartDatetime()) {
+				if($driver_trip->inDatetimeRange($trip->getEndDatetime()) && $trip->getStartDatetime() < $driver_trip->getStartDatetime()) {
 					$tmp_start_datetime = $trip->getStartDatetime();
 				}
 
-				if($driver_trip->inDatetimeRange($trip->getStartDatetime()) && $driver_trip->getEndDatetime() < $trip->getEndDatetime()) {
+				if($driver_trip->inDatetimeRange($trip->getStartDatetime()) && $trip->getEndDatetime() > $driver_trip->getEndDatetime()) {
 					$tmp_end_datetime = $trip->getEndDatetime();
 				}
 
 				if($tmp_start_datetime !== $driver_trip->getStartDatetime() || $tmp_end_datetime !== $driver_trip->getEndDatetime()) {
 					$modified_existed = true;
-					echo "match for " . $driver_trip->getId() . PHP_EOL;
 				}
 
 				$driver_trip->setStartDatetime($tmp_start_datetime);
@@ -210,7 +215,15 @@ if (($fp = fopen($input_csv, "r")) !== FALSE) {
 	fwrite($fp_csv, "driver_id,total_minutes_with_passenger");
 
 	foreach($drivers->all() as $key => $driver) {
-		fwrite($fp_csv, PHP_EOL . $driver->getId() . "," . gmdate('H:i:s', $driver->getFullTripsDuration()));
+		switch($duration_type) {
+			case 'd':
+				fwrite($fp_csv, PHP_EOL . $driver->getId() . "," . gmdate('H:i:s', $driver->getFullTripsDuration()));
+				break;
+			case 's':
+				fwrite($fp_csv, PHP_EOL . $driver->getId() . "," . $driver->getFullTripsDuration());
+				break;
+			default:;
+		}
 	}
 
 	fclose($fp_csv);
